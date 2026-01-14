@@ -34,11 +34,9 @@ def chunk_by_sentences(
     Returns:
         List of text chunks
     """
-    # Split into sentences using regex (simple but effective)
     sentence_endings = re.compile(r"(?<=[.!?])\s+")
     sentences = sentence_endings.split(text.strip())
 
-    # Clean up sentences
     sentences = [s.strip() for s in sentences if s.strip()]
 
     if not sentences:
@@ -51,7 +49,6 @@ def chunk_by_sentences(
         chunk_sentences = sentences[i : i + sentences_per_chunk]
         chunk_text = " ".join(chunk_sentences)
 
-        # Only add chunks that meet minimum length requirement
         if len(chunk_text) >= min_chunk_length:
             chunks.append(chunk_text)
 
@@ -70,11 +67,10 @@ def chunk_by_paragraphs(text: str, max_chunk_size: int = 1000, overlap: int = 10
     Returns:
         List of text chunks
     """
-    # Split by double newlines (paragraphs)
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 
     if not paragraphs:
-        return chunk_by_sentences(text)  # Fallback
+        return chunk_by_sentences(text)
 
     chunks = []
     current_chunk = ""
@@ -101,7 +97,6 @@ def chunk_by_paragraphs(text: str, max_chunk_size: int = 1000, overlap: int = 10
             else:
                 current_chunk = paragraph
 
-    # Add the last chunk
     if current_chunk.strip():
         chunks.append(current_chunk.strip())
 
@@ -124,23 +119,20 @@ def smart_chunk(text: str, method: str = "sentences", **kwargs) -> list[str]:
         return []
 
     if method == "sentences":
-        # Filter out incompatible kwargs
         sentence_kwargs = {
             k: v
             for k, v in kwargs.items()
             if k in ["sentences_per_chunk", "overlap", "min_chunk_length"]
         }
+
         return chunk_by_sentences(text, **sentence_kwargs)
     elif method == "paragraphs":
-        # Filter out incompatible kwargs
         paragraph_kwargs = {k: v for k, v in kwargs.items() if k in ["max_chunk_size", "overlap"]}
         return chunk_by_paragraphs(text, **paragraph_kwargs)
     elif method == "words":
-        # Filter out incompatible kwargs
         word_kwargs = {k: v for k, v in kwargs.items() if k in ["chunk_size", "overlap"]}
         return chunk_text(text, **word_kwargs)
     else:
-        # Auto-detect best method
         if "\n\n" in text and len(text.split("\n\n")) > 2:
             return chunk_by_paragraphs(text)
         elif len(text.split(".")) > 3:

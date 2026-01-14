@@ -3,8 +3,7 @@
 from pathlib import Path
 from typing import Any, Optional
 
-# Optional imports with type safety
-pypdf_module: Any = None
+pypdf_module = None
 try:
     import pypdf
 
@@ -12,7 +11,7 @@ try:
 except ImportError:
     pass
 
-docx_module: Any = None
+docx_module = None
 try:
     import docx
 

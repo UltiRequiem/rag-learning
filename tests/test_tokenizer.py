@@ -112,7 +112,7 @@ def test_tokenizer_nltk_import_error():
         assert len(tokenizer.vocab) > 0
 
         # Should still work with simple stemming
-        words = tokenizer._clean("running runs runner")
+        words = list(tokenizer._clean("running runs runner"))
         assert len(words) > 0
 
 

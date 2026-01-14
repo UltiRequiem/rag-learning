@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 try:
@@ -10,7 +9,6 @@ try:
 
     NLTK_AVAILABLE = True
 
-    # Download required NLTK data if not already present
     try:
         nltk.data.find("corpora/stopwords")
     except LookupError:
@@ -83,24 +81,23 @@ class Tokenizer:
     def _stem_word(word: str, extra: int = 2) -> str:
         if NLTK_AVAILABLE and STEMMER:
             return STEMMER.stem(word)
-        else:
-            # Fallback to simple stemming
-            for suffix, replacement in Tokenizer.SUFFIXES:
-                if word.endswith(suffix) and len(word) > len(suffix) + extra:
-                    return word[: -len(suffix)] + replacement
-            return word
+
+        for suffix, replacement in Tokenizer.SUFFIXES:
+            if word.endswith(suffix) and len(word) > len(suffix) + extra:
+                return word[: -len(suffix)] + replacement
+
+        return word
 
     @staticmethod
     def _clean(word: str) -> list[str]:
         clean = word.lower().translate(Tokenizer.TRANSLATION_TABLE)
         words = clean.split()
 
-        # Remove stopwords if NLTK is available
         if NLTK_AVAILABLE and STOP_WORDS:
             words = [w for w in words if w not in STOP_WORDS and len(w) > 2]
 
-        # Stem words
         stemmed = [Tokenizer._stem_word(w) for w in words]
 
-        # Remove empty strings
-        return [w for w in stemmed if w]
+        not_empty = [w for w in stemmed if w and w.strip()]
+
+        return not_empty

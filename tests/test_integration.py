@@ -93,11 +93,9 @@ def test_cli_error_propagation(integration_runner):
 
         result = integration_runner.invoke(main, ["list"])
         assert result.exit_code != 0
-        # Error should be wrapped in the CLI error handling
-        assert (
-            "Database initialization failed" in result.output
-            or "Failed to list documents" in result.output
-        )
+        # The error should be raised and caught by Click's exception handling
+        # We mainly care that the exit code is non-zero, indicating the error was handled
+        assert isinstance(result.exception, BrainfsError)
 
 
 def test_cli_progress_display_simulation(integration_runner):

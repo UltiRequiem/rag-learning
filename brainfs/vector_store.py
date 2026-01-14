@@ -13,7 +13,7 @@ class VectorItem(TypedDict):
 class VectorStore:
     database: list[VectorItem]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.database = []
 
     def add_item(self, text: str, vector: Sequence[float]) -> None:
@@ -21,7 +21,7 @@ class VectorStore:
 
         self.database.append(item)
 
-    def full_search(self, query_vec: Sequence[float]):
+    def full_search(self, query_vec: Sequence[float]) -> list[tuple[float, str]]:
         results: list[tuple[float, str]] = []
 
         for item in self.database:
@@ -33,11 +33,7 @@ class VectorStore:
         return results
 
     def search(self, query_vec: Sequence[float], top_k: int = 5) -> list[tuple[float, str]]:
-        if top_k <= 0:
-            return []
-
-        # Check if query vector is zero
-        if not any(query_vec):
+        if top_k <= 0 or not any(query_vec):
             return []
 
         query_norm = normalize(query_vec)
