@@ -1,6 +1,6 @@
 from text import chunk_text
-from vector_store import VectorStore
 from tokenizer import Tokenizer
+from vector_store import VectorStore
 
 raw_text = """
     Python is a high-level, general-purpose programming language.
@@ -31,9 +31,9 @@ def print_search_results(query: str, results: list[tuple[float, str]]) -> None:
     print("All Matches:")
 
     for score, text in results:
-        print(f"Score: {score:.4f} | Text: \"{text}\"")
+        print(f'Score: {score:.4f} | Text: "{text}"')
 
-    print(f"Retrieved Context: \"{top_match[1]}\"")
+    print(f'Retrieved Context: "{top_match[1]}"')
 
 
 def print_llm_prompt(context: str, query: str) -> None:
@@ -48,6 +48,7 @@ def print_llm_prompt(context: str, query: str) -> None:
 
 def create_chunks() -> list[str]:
     return chunk_text(raw_text, chunk_size=8, overlap=3)
+
 
 def build_vector_store(chunks: list[str]) -> tuple[VectorStore, Tokenizer]:
     vectorizer = Tokenizer()

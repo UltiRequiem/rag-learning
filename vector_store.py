@@ -1,12 +1,14 @@
-from typing import TypedDict
-from collections.abc import Sequence
 import heapq
+from collections.abc import Sequence
+from typing import TypedDict
 
-from vector import normalize, dot_product
+from vector import dot_product, normalize
+
 
 class VectorItem(TypedDict):
     text: str
     vector: Sequence[float]
+
 
 class VectorStore:
     database: list[VectorItem]
@@ -38,14 +40,12 @@ class VectorStore:
 
         heap: list[tuple[float, str]] = []
 
-
         for item in self.database:
             score = dot_product(item["vector"], query_norm)
 
             if len(heap) < top_k:
                 heapq.heappush(heap, (score, item["text"]))
             elif score > heap[0][0]:
-                _ = heapq.heapreplace(heap, (score, item["text"]))
-
+                heapq.heapreplace(heap, (score, item["text"]))
 
         return sorted(heap, reverse=True)

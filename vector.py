@@ -1,15 +1,17 @@
 import math
-
 from collections.abc import Sequence
 
-def dot_product(vec_a: Sequence[float],vec_b: Sequence[float]) -> float:
+
+def dot_product(vec_a: Sequence[float], vec_b: Sequence[float]) -> float:
     if len(vec_a) != len(vec_b):
         raise ValueError("Vectors must be of the same length")
 
     return sum(a * b for a, b in zip(vec_a, vec_b))
 
+
 def magnitude(vec: Sequence[float]) -> float:
-    return math.sqrt(sum(x ** 2 for x in vec))
+    return math.sqrt(sum(x**2 for x in vec))
+
 
 def normalize(vec: Sequence[float]) -> Sequence[float]:
     mag = magnitude(vec)
@@ -18,6 +20,7 @@ def normalize(vec: Sequence[float]) -> Sequence[float]:
         raise ValueError("Cannot normalize a zero-length vector")
 
     return [x / mag for x in vec]
+
 
 def cosine_similarity(vec_a: Sequence[float], vec_b: Sequence[float]) -> float:
     if len(vec_a) != len(vec_b):
@@ -30,7 +33,8 @@ def cosine_similarity(vec_a: Sequence[float], vec_b: Sequence[float]) -> float:
 
     return dot_product(vec_a, vec_b) / (mag_a * mag_b)
 
-def matmul(matrix:Sequence[Sequence[float]], vector:Sequence[float]) -> list[float]:
+
+def matmul(matrix: Sequence[Sequence[float]], vector: Sequence[float]) -> list[float]:
     results: list[float] = []
 
     for row in matrix:

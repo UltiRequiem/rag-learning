@@ -1,4 +1,14 @@
-from helpers import build_vector_store, create_chunks, default_query, print_chunks, print_indexing_step, print_llm_prompt, print_search_results, raw_text, search_query
+from helpers import (
+    build_vector_store,
+    create_chunks,
+    default_query,
+    print_chunks,
+    print_indexing_step,
+    print_llm_prompt,
+    print_search_results,
+    raw_text,
+    search_query,
+)
 
 
 def run_rag_pipeline(query: str = default_query) -> None:
@@ -18,6 +28,9 @@ def run_rag_pipeline(query: str = default_query) -> None:
 if __name__ == "__main__":
     print("Based on the following text:")
     print(raw_text)
-    question = input("Enter your question about Python (or press Enter to use default): ").strip() or default_query
+    question = (
+        input("Enter your question about Python (or press Enter to use default): ").strip()
+        or default_query
+    )
 
     run_rag_pipeline(question)
