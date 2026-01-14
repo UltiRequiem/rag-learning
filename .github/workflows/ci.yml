@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 jobs:
-  quality:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,15 +27,68 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev
 
+      - name: Run tests
+        run: uv run pytest tests/ -v --cov=brainfs --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
+
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
       - name: Run ruff check
         run: uv run ruff check .
 
       - name: Run ruff format check
         run: uv run ruff format --check .
 
-      - name: Run ty
+      - name: Run type checking
         run: uv run ty check .
 
-      - name: Test basic functionality
+  integration:
+    runs-on: ubuntu-latest
+    needs: [test, quality]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Test CLI installation
         run: |
-          echo "What paradigms does Python support?" | uv run python main.py
+          uv run brainfs config
+          uv run brainfs --help
+
+      - name: Test document indexing
+        run: |
+          echo "# Test Document\nThis is a test document." > test.md
+          uv run brainfs index test.md --chunk-method sentences
+
+      - name: Test querying
+        run: |
+          uv run brainfs query "test document"
+          uv run brainfs list

@@ -11,6 +11,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from .database import Document, DocumentDatabase, calculate_file_hash
+from .exceptions import BrainfsError
 from .llm import LLMClient
 from .parsers import DocumentParserFactory, parse_document
 from .text import smart_chunk
@@ -18,12 +19,6 @@ from .tokenizer import Tokenizer
 from .vector_store import VectorStore
 
 console = Console()
-
-
-class BrainfsError(Exception):
-    """Custom exception for Brainfs errors."""
-
-    pass
 
 
 @click.group()
@@ -51,13 +46,11 @@ def index(path: Path, chunk_method: str, chunk_size: int, chunk_overlap: int, re
             console.print("No supported files found.", style="yellow")
             return
 
-        # Initialize tokenizer
         tokenizer = Tokenizer()
 
         with Progress(
             SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console
         ) as progress:
-            # First pass: collect all text for tokenizer training
             task = progress.add_task("Analyzing documents...", total=len(files_to_process))
             all_chunks = []
 
@@ -70,7 +63,7 @@ def index(path: Path, chunk_method: str, chunk_size: int, chunk_overlap: int, re
                         method=chunk_method,
                         sentences_per_chunk=chunk_size,
                         overlap=chunk_overlap,
-                        chunk_size=chunk_size,  # For word-based chunking
+                        chunk_size=chunk_size,
                     )
                     all_chunks.extend(chunks)
                 except Exception as e:
@@ -78,11 +71,9 @@ def index(path: Path, chunk_method: str, chunk_size: int, chunk_overlap: int, re
                     continue
                 progress.advance(task)
 
-            # Train tokenizer
             progress.update(task, description="Training tokenizer...")
             tokenizer.fit(all_chunks)
 
-            # Second pass: index documents
             task = progress.add_task("Indexing documents...", total=len(files_to_process))
             indexed_count = 0
             skipped_count = 0
@@ -91,8 +82,8 @@ def index(path: Path, chunk_method: str, chunk_size: int, chunk_overlap: int, re
                 progress.update(task, description=f"Indexing {file_path.name}...")
 
                 try:
-                    # Check if already indexed
                     file_hash = calculate_file_hash(file_path)
+
                     if db.document_exists(file_hash):
                         console.print(f"Skipping {file_path.name} (already indexed)", style="dim")
                         skipped_count += 1
@@ -138,7 +129,6 @@ def index(path: Path, chunk_method: str, chunk_size: int, chunk_overlap: int, re
 
                 progress.advance(task)
 
-        # Summary
         console.print(
             Panel(
                 f"Indexing complete!\n\n"
@@ -163,14 +153,14 @@ def query(query: str, top_k: int, interactive: bool, generate: bool):
     try:
         db = DocumentDatabase()
 
-        # Check if any documents are indexed
         docs = db.list_documents()
+
         if not docs:
             console.print("No documents indexed. Run 'brainfs index <path>' first.", style="red")
             return
 
-        # Get all chunks for searching
         chunk_data = db.search_chunks()
+
         if not chunk_data:
             console.print("No searchable content found.", style="red")
             return
@@ -353,7 +343,6 @@ def _get_files_to_process(path: Path, recursive: bool) -> builtins.list[Path]:
         else:
             console.print(f"Unsupported file type: {path.suffix}", style="red")
     else:
-        # Directory
         pattern = "**/*" if recursive else "*"
         for file_path in path.glob(pattern):
             if file_path.is_file() and DocumentParserFactory.is_supported(file_path):

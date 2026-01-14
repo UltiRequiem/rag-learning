@@ -3,3 +3,7 @@ __pycache__/
 .venv/
 .ruff_cache/
 .env
+htmlcov/
+.coverage
+coverage.xml
+.pytest_cache
