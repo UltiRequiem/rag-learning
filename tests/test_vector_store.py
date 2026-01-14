@@ -252,3 +252,34 @@ def test_zero_vector_handling():
     # Adding a zero vector should raise an error during normalization
     with pytest.raises(ValueError, match="Cannot normalize a zero-length vector"):
         store.add_item("Zero vector", [0.0, 0.0, 0.0])
+
+
+def test_batch_add_items():
+    """Test batch adding items to vector store."""
+    store = VectorStore()
+
+    texts = ["Doc 1", "Doc 2", "Doc 3"]
+    vectors = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+
+    store.add_items_batch(texts, vectors)
+
+    assert store.size() == 3
+    assert len(store.database) == 3
+
+    # Test mismatched lengths
+    with pytest.raises(ValueError, match="Number of texts and vectors must match"):
+        store.add_items_batch(["Text"], [[1.0], [2.0]])
+
+
+def test_store_clear():
+    """Test clearing the vector store."""
+    store = VectorStore()
+
+    # Add some items
+    store.add_items_batch(["Doc 1", "Doc 2"], [[1.0, 0.0], [0.0, 1.0]])
+    assert store.size() == 2
+
+    # Clear the store
+    store.clear()
+    assert store.size() == 0
+    assert len(store.database) == 0

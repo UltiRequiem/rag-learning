@@ -65,17 +65,55 @@ class Tokenizer:
 
     def embed(self, text: str) -> list[float]:
         words = self._clean(text)
-        vector = self._create_empty_vector()
 
-        for word in words:
-            if word in self.vocab:
-                index = self.vocab[word]
-                vector[index] += 1
+        try:
+            import numpy as np
 
-        return vector
+            vector = np.zeros(len(self.vocab), dtype=np.float64)
+
+            word_indices = [self.vocab[word] for word in words if word in self.vocab]
+
+            if word_indices:
+                unique_indices, counts = np.unique(word_indices, return_counts=True)
+                vector[unique_indices] = counts
+
+            return vector.tolist()
+        except ImportError:
+            # Fallback to original implementation
+            vector = self._create_empty_vector()
+
+            for word in words:
+                if word in self.vocab:
+                    index = self.vocab[word]
+                    vector[index] += 1
+
+            return vector
 
     def _create_empty_vector(self) -> list[float]:
         return [0] * len(self.vocab)
+
+    def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        """Embed multiple texts efficiently using NumPy when available."""
+        try:
+            import numpy as np
+
+            # Create matrix for all embeddings
+            batch_size = len(texts)
+            vocab_size = len(self.vocab)
+            embeddings = np.zeros((batch_size, vocab_size), dtype=np.float64)
+
+            for i, text in enumerate(texts):
+                words = self._clean(text)
+                word_indices = [self.vocab[word] for word in words if word in self.vocab]
+
+                if word_indices:
+                    unique_indices, counts = np.unique(word_indices, return_counts=True)
+                    embeddings[i, unique_indices] = counts
+
+            return embeddings.tolist()
+        except ImportError:
+            # Fallback to individual embeddings
+            return [self.embed(text) for text in texts]
 
     @staticmethod
     def _stem_word(word: str, extra: int = 2) -> str:

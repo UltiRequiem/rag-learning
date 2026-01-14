@@ -240,3 +240,36 @@ def test_tokenizer_word_frequency_impact():
     # Both should have non-zero elements
     assert sum(apple_heavy) > 0
     assert sum(banana_single) > 0
+
+
+def test_tokenizer_batch_embedding():
+    """Test batch embedding functionality."""
+    tokenizer = Tokenizer()
+
+    documents = ["hello world", "world peace", "hello peace"]
+    tokenizer.fit(documents)
+
+    # Test batch embedding
+    texts = ["hello", "world", "peace"]
+    batch_results = tokenizer.embed_batch(texts)
+
+    # Should return list of embeddings
+    assert len(batch_results) == 3
+    assert all(len(embedding) == len(tokenizer.vocab) for embedding in batch_results)
+
+    # Compare with individual embeddings
+    individual_results = [tokenizer.embed(text) for text in texts]
+
+    # Results should be the same
+    for batch, individual in zip(batch_results, individual_results):
+        assert batch == individual
+
+
+def test_tokenizer_empty_batch():
+    """Test batch embedding with empty input."""
+    tokenizer = Tokenizer()
+    tokenizer.fit(["hello world"])
+
+    # Empty batch
+    result = tokenizer.embed_batch([])
+    assert result == []
