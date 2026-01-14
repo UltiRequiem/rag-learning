@@ -2,7 +2,7 @@ import heapq
 from collections.abc import Sequence
 from typing import TypedDict
 
-from vector import dot_product, normalize
+from .vector import dot_product, normalize
 
 
 class VectorItem(TypedDict):
@@ -34,6 +34,10 @@ class VectorStore:
 
     def search(self, query_vec: Sequence[float], top_k: int = 5) -> list[tuple[float, str]]:
         if top_k <= 0:
+            return []
+
+        # Check if query vector is zero
+        if not any(query_vec):
             return []
 
         query_norm = normalize(query_vec)

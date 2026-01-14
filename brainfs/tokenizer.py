@@ -1,3 +1,35 @@
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+try:
+    import nltk
+    from nltk.corpus import stopwords
+    from nltk.stem import PorterStemmer
+
+    NLTK_AVAILABLE = True
+
+    # Download required NLTK data if not already present
+    try:
+        nltk.data.find("corpora/stopwords")
+    except LookupError:
+        nltk.download("stopwords", quiet=True)
+
+    try:
+        nltk.data.find("tokenizers/punkt")
+    except LookupError:
+        nltk.download("punkt", quiet=True)
+
+    STEMMER = PorterStemmer()
+    STOP_WORDS = set(stopwords.words("english"))
+
+except ImportError:
+    NLTK_AVAILABLE = False
+    STEMMER = None
+    STOP_WORDS = set()
+
+
 class Tokenizer:
     vocab: dict[str, int]
     TRANSLATION_TABLE: dict[int, int | None] = str.maketrans("", "", "!.?,;:\"'()[]{}<>")
@@ -49,16 +81,26 @@ class Tokenizer:
 
     @staticmethod
     def _stem_word(word: str, extra: int = 2) -> str:
-        for suffix, replacement in Tokenizer.SUFFIXES:
-            if word.endswith(suffix) and len(word) > len(suffix) + extra:
-                return word[: -len(suffix)] + replacement
-
-        return word
+        if NLTK_AVAILABLE and STEMMER:
+            return STEMMER.stem(word)
+        else:
+            # Fallback to simple stemming
+            for suffix, replacement in Tokenizer.SUFFIXES:
+                if word.endswith(suffix) and len(word) > len(suffix) + extra:
+                    return word[: -len(suffix)] + replacement
+            return word
 
     @staticmethod
     def _clean(word: str) -> list[str]:
         clean = word.lower().translate(Tokenizer.TRANSLATION_TABLE)
         words = clean.split()
-        stemed = [Tokenizer._stem_word(w) for w in words]
 
-        return stemed
+        # Remove stopwords if NLTK is available
+        if NLTK_AVAILABLE and STOP_WORDS:
+            words = [w for w in words if w not in STOP_WORDS and len(w) > 2]
+
+        # Stem words
+        stemmed = [Tokenizer._stem_word(w) for w in words]
+
+        # Remove empty strings
+        return [w for w in stemmed if w]
