@@ -1,6 +1,6 @@
 from text import chunk_text
 from vector import cosine_similarity
-from vector_store import VectorItem
+from vector_store import VectorStore, VectorItem
 from tokenizer import Tokenizer
 
 raw_text = """
@@ -25,28 +25,26 @@ def run_rag_demo(query:str = default_query) -> None:
     print("\n--- 2. INDEXING (Vectorization) ---")
     vectorizer = Tokenizer()
     vectorizer.fit(chunks) 
+    store = VectorStore()
     
-    vector_db: list[VectorItem] = []
 
     for chunk in chunks:
         vec = vectorizer.embed(chunk)
-        vec_item = VectorItem(text=chunk, vector=vec)
-        vector_db.append(vec_item)
+        store.add_item(chunk, vec)
 
     print(f"\n--- 3. SEARCHING FOR: '{query}' ---")
     
     query_vec = vectorizer.embed(query)
+    results = store.search(query_vec, top_k=3)
     
-    results: list[tuple[float, str]] = []
-
-    for entry in vector_db:
-        score = cosine_similarity(query_vec, entry["vector"])
-        results.append((score, entry["text"]))
-    
-    results.sort(key=lambda x: x[0], reverse=True)
 
     top_match = results[0]
     print(f"\nTop Match Score: {top_match[0]:.4f}")
+    print(f"All Matches:")
+
+    for score, text in results:
+        print(f"Score: {score:.4f} | Text: \"{text}\"")
+
     print(f"Retrieved Context: \"{top_match[1]}\"")
     
     print("\n--- 4. PROMPT FOR LLM ---")
