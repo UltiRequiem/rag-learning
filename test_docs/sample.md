@@ -1,14 +1,18 @@
 # Python Programming Guide
 
-Python is a high-level, general-purpose programming language. Its design philosophy emphasizes code readability with the use of significant indentation.
+Python is a high-level, general-purpose programming language. Its design
+philosophy emphasizes code readability with the use of significant indentation.
 
 ## Key Features
 
-Python is dynamically typed and garbage-collected. It supports multiple programming paradigms, including structured, object-oriented and functional programming.
+Python is dynamically typed and garbage-collected. It supports multiple
+programming paradigms, including structured, object-oriented and functional
+programming.
 
 ### Object-Oriented Programming
 
 Python supports object-oriented programming with features like:
+
 - Classes and objects
 - Inheritance
 - Polymorphism
@@ -17,6 +21,7 @@ Python supports object-oriented programming with features like:
 ### Functional Programming
 
 Python also supports functional programming concepts:
+
 - First-class functions
 - Lambda expressions
 - Map, filter, and reduce functions
@@ -25,6 +30,7 @@ Python also supports functional programming concepts:
 ## Popular Libraries
 
 Python has an extensive ecosystem of libraries:
+
 - **NumPy**: For numerical computing
 - **Pandas**: For data analysis and manipulation
 - **Django**: For web development
@@ -32,4 +38,5 @@ Python has an extensive ecosystem of libraries:
 
 ## Conclusion
 
-Python's simplicity and powerful libraries make it an excellent choice for beginners and experts alike.
+Python's simplicity and powerful libraries make it an excellent choice for
+beginners and experts alike.

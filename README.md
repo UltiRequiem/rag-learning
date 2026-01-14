@@ -1,15 +1,18 @@
 # Brainfs - AI Document Search & RAG
 
-A modern CLI tool for document indexing and querying using vector search and LLM-powered answer generation.
+A modern CLI tool for document indexing and querying using vector search and
+LLM-powered answer generation.
 
 ## Features
 
 - **Multi-format Support**: PDF, Markdown, TXT, DOCX parsing
 - **Smart Chunking**: Sentence-based, paragraph-based, or word-based strategies
-- **Vector Search**: Efficient similarity search with NLTK stemming and stopword removal
+- **Vector Search**: Efficient similarity search with NLTK stemming and stopword
+  removal
 - **LLM Integration**: OpenAI API for intelligent answer generation
 - **Persistent Storage**: SQLite database with document deduplication
-- **Rich CLI**: Beautiful terminal interface with progress bars and interactive mode
+- **Rich CLI**: Beautiful terminal interface with progress bars and interactive
+  mode
 
 ## Architecture
 
@@ -17,7 +20,7 @@ A modern CLI tool for document indexing and querying using vector search and LLM
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
 │   Documents │───▶│   Parsing   │───▶│   Chunking  │
 └─────────────┘    └─────────────┘    └─────────────┘
-                                               │
+                                              │
 ┌─────────────┐    ┌─────────────┐    ┌───────▼─────┐
 │ LLM Answers │◀───│Vector Search│◀───│   Storage   │
 └─────────────┘    └─────────────┘    └─────────────┘
@@ -88,6 +91,7 @@ brainfs index docs/ --chunk-method words --chunk-size 100
 ## Examples
 
 ### Index Technical Documentation
+
 ```bash
 # Index all markdown files recursively
 brainfs index ./technical-docs/ --recursive --chunk-method sentences
@@ -97,6 +101,7 @@ brainfs query "How do I set up authentication?" --generate
 ```
 
 ### Interactive Research Session
+
 ```bash
 # Start interactive mode
 brainfs query --interactive --generate
@@ -113,7 +118,8 @@ brainfs query --interactive --generate
 This project uses modern Python tooling:
 
 - **[uv](https://github.com/astral-sh/uv)**: Fast Python package manager
-- **[ruff](https://github.com/astral-sh/ruff)**: Lightning-fast linter and formatter
+- **[ruff](https://github.com/astral-sh/ruff)**: Lightning-fast linter and
+  formatter
 - **[ty](https://docs.astral.sh/ty/)**: Astral's fast type checker
 - **[pre-commit](https://pre-commit.com/)**: Git hooks for code quality
 
@@ -153,6 +159,7 @@ uv run pre-commit run --all-files
 ## Configuration
 
 Brainfs stores its configuration and database in:
+
 - **Database**: `~/.brainfs/documents.db`
 - **Config**: Environment variables via `.env`
 
@@ -173,21 +180,25 @@ OPENAI_API_KEY=sk-...
 ## Core Components
 
 ### Tokenizer (`tokenizer.py`)
+
 - NLTK-powered stemming and stopword removal
 - Bag-of-words vectorization with fallbacks
 - Automatic NLTK data downloads
 
 ### Vector Store (`vector_store.py`)
+
 - Normalized vector storage
 - Efficient top-k search using heaps
 - Cosine similarity scoring
 
 ### Database (`database.py`)
+
 - SQLite document storage with metadata
 - Automatic deduplication by file hash
 - Chunked text storage with vectors
 
 ### LLM Integration (`llm.py`)
+
 - OpenAI API integration
 - Context-aware answer generation
 - Graceful fallbacks when unavailable
@@ -195,6 +206,7 @@ OPENAI_API_KEY=sk-...
 ## CI/CD
 
 GitHub Actions automatically runs:
+
 - Code quality checks (ruff)
 - Type checking (ty)
 - Multi-Python version testing (3.9-3.12)
