@@ -79,7 +79,6 @@ class Tokenizer:
 
             return vector.tolist()
         except ImportError:
-            # Fallback to original implementation
             vector = self._create_empty_vector()
 
             for word in words:
@@ -97,7 +96,6 @@ class Tokenizer:
         try:
             import numpy as np
 
-            # Create matrix for all embeddings
             batch_size = len(texts)
             vocab_size = len(self.vocab)
             embeddings = np.zeros((batch_size, vocab_size), dtype=np.float64)
@@ -112,7 +110,6 @@ class Tokenizer:
 
             return embeddings.tolist()
         except ImportError:
-            # Fallback to individual embeddings
             return [self.embed(text) for text in texts]
 
     @staticmethod

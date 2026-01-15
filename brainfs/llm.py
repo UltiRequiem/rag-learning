@@ -4,7 +4,6 @@ import os
 
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 try:
@@ -23,6 +22,7 @@ class LLMClient:
             raise ImportError("OpenAI library not installed. Run: pip install openai")
 
         self.api_key = os.getenv("OPENAI_API_KEY")
+
         if not self.api_key:
             raise ValueError("OPENAI_API_KEY environment variable not set")
 
@@ -33,7 +33,6 @@ class LLMClient:
     ) -> str:
         """Generate an answer using the provided contexts."""
 
-        # Combine contexts
         combined_context = "\n\n---\n\n".join(contexts)
 
         prompt = f"""You are a helpful assistant that answers questions based on the provided context.

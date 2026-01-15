@@ -78,8 +78,8 @@ class VectorStore:
 
         if NUMPY_AVAILABLE and len(self.database) > 50:
             return self._search_vectorized(query_vec, top_k)
-        else:
-            return self._search_fallback(query_vec, top_k)
+
+        return self._search_fallback(query_vec, top_k)
 
     def _search_vectorized(self, query_vec: ArrayLike, top_k: int) -> list[tuple[float, str]]:
         """Vectorized search using NumPy for maximum performance."""
@@ -88,22 +88,18 @@ class VectorStore:
         if self._vectors_matrix is None:
             return []
 
-        # Normalize query vector
         query_norm = np.asarray(normalize(query_vec), dtype=np.float64)
 
-        # Compute all similarities at once - massive speedup!
         similarities = np.dot(self._vectors_matrix, query_norm)
 
-        # Get top-k indices using NumPy's argpartition (faster than full sort)
         if len(similarities) <= top_k:
             top_indices = np.argsort(similarities)[::-1]
         else:
-            # Use partial sort for better performance
             top_indices = np.argpartition(similarities, -top_k)[-top_k:]
             top_indices = top_indices[np.argsort(similarities[top_indices])[::-1]]
 
-        # Return results
         results = []
+
         for idx in top_indices:
             score = float(similarities[idx])
             text = self._texts[idx]
@@ -131,7 +127,6 @@ class VectorStore:
         if NUMPY_AVAILABLE and len(self.database) > 100:
             return self._search_vectorized(query_vec, len(self.database))
         else:
-            # Fallback implementation
             results: list[tuple[float, str]] = []
             query_norm = normalize(query_vec)
 
