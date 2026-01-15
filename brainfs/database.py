@@ -69,7 +69,6 @@ class DocumentDatabase:
     def add_document(self, document: Document) -> None:
         """Add a document to the database."""
         with sqlite3.connect(self.db_path) as conn:
-            # Insert document
             conn.execute(
                 """
                 INSERT OR REPLACE INTO documents (id, path, filename, content, file_hash)
@@ -84,10 +83,8 @@ class DocumentDatabase:
                 ),
             )
 
-            # Delete existing chunks for this document
             conn.execute("DELETE FROM chunks WHERE document_id = ?", (document.id,))
 
-            # Insert chunks
             for i, (chunk, vector) in enumerate(zip(document.chunks, document.vectors)):
                 conn.execute(
                     """
@@ -100,7 +97,6 @@ class DocumentDatabase:
     def get_document(self, doc_id: str) -> Optional[Document]:
         """Get a document by ID."""
         with sqlite3.connect(self.db_path) as conn:
-            # Get document metadata
             doc_row = conn.execute(
                 """
                 SELECT id, path, filename, content, file_hash
@@ -112,7 +108,6 @@ class DocumentDatabase:
             if not doc_row:
                 return None
 
-            # Get chunks
             chunk_rows = conn.execute(
                 """
                 SELECT text, vector FROM chunks
@@ -172,17 +167,21 @@ class DocumentDatabase:
 
     def clear_all(self) -> int:
         """Clear all documents and chunks. Returns number of documents deleted."""
+
         with sqlite3.connect(self.db_path) as conn:
             count = conn.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
             conn.execute("DELETE FROM chunks")
             conn.execute("DELETE FROM documents")
+
             return count
 
 
 def calculate_file_hash(file_path: Path) -> str:
     """Calculate SHA-256 hash of file contents."""
     hash_sha256 = hashlib.sha256()
+
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_sha256.update(chunk)
+
     return hash_sha256.hexdigest()
